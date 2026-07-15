@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { isWithinOpeningHours, generateAlternativeSlots } from '@/lib/booking-utils';
+import { isWithinOpeningHours, generateAlternativeSlots, DEFAULT_SERVICES } from '@/lib/booking-utils';
 
 export async function POST(request) {
   try {
@@ -24,14 +24,26 @@ export async function POST(request) {
     let durationMinutes = category === 'tattoo' ? 120 : 45; // Výchozí hodnoty
 
     if (serviceId) {
-      const { data: service, error: serviceError } = await supabase
-        .from('services')
-        .select('duration_minutes')
-        .eq('id', serviceId)
-        .single();
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isValidUUID = uuidRegex.test(serviceId);
 
-      if (!serviceError && service) {
-        durationMinutes = service.duration_minutes;
+      if (isValidUUID) {
+        // Pokud je to platné UUID, dotážeme se databáze
+        const { data: service, error: serviceError } = await supabase
+          .from('services')
+          .select('duration_minutes')
+          .eq('id', serviceId)
+          .single();
+
+        if (!serviceError && service) {
+          durationMinutes = service.duration_minutes;
+        }
+      } else {
+        // Pokud to není UUID, zkusíme najít službu ve výchozích (fallback) službách
+        const defaultService = DEFAULT_SERVICES.find(s => s.id === serviceId);
+        if (defaultService) {
+          durationMinutes = defaultService.duration_minutes;
+        }
       }
     }
 

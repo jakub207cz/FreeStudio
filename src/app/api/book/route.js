@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { isWithinOpeningHours } from '@/lib/booking-utils';
+import { isWithinOpeningHours, DEFAULT_SERVICES } from '@/lib/booking-utils';
 
 export async function POST(request) {
   try {
@@ -29,18 +29,37 @@ export async function POST(request) {
       );
     }
 
-    // 1. Zjistit délku služby
+    // 1. Zjistit délku a název služby
     let durationMinutes = category === 'tattoo' ? 120 : 45; // Výchozí hodnoty
+    let resolvedServiceId = null;
+    let resolvedCustomRequest = customRequestText || null;
 
     if (serviceId) {
-      const { data: service, error: serviceError } = await supabase
-        .from('services')
-        .select('duration_minutes')
-        .eq('id', serviceId)
-        .single();
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const isValidUUID = uuidRegex.test(serviceId);
 
-      if (!serviceError && service) {
-        durationMinutes = service.duration_minutes;
+      if (isValidUUID) {
+        // Pokud je to platné UUID z databáze
+        const { data: service, error: serviceError } = await supabase
+          .from('services')
+          .select('duration_minutes')
+          .eq('id', serviceId)
+          .single();
+
+        if (!serviceError && service) {
+          durationMinutes = service.duration_minutes;
+          resolvedServiceId = serviceId;
+        }
+      } else {
+        // Pokud to není UUID, zkusíme najít službu ve výchozích (fallback) službách
+        const defaultService = DEFAULT_SERVICES.find(s => s.id === serviceId);
+        if (defaultService) {
+          durationMinutes = defaultService.duration_minutes;
+          // Název služby zapíšeme jako vlastního požadavku, aby Barbara viděla, co si objednali
+          resolvedCustomRequest = customRequestText 
+            ? `${defaultService.name} - ${customRequestText}` 
+            : defaultService.name;
+        }
       }
     }
 
@@ -90,8 +109,8 @@ export async function POST(request) {
       .from('bookings')
       .insert([
         {
-          service_id: serviceId || null,
-          custom_service_request: customRequestText || null,
+          service_id: resolvedServiceId,
+          custom_service_request: resolvedCustomRequest,
           client_name: clientName,
           client_phone: clientPhone,
           client_notes: clientNotes || null,

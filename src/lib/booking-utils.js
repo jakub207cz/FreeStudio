@@ -11,6 +11,15 @@ export const OPENING_HOURS = {
   0: null, // Zavřeno
 };
 
+export const DEFAULT_SERVICES = [
+  { id: 'b1', name: 'Klasický střih & styling', category: 'barber', duration_minutes: 45, price: 550, description: 'Mytí, střih, foukaná, kolínská a styling.' },
+  { id: 'b2', name: 'Úprava vousů & hot towel', category: 'barber', duration_minutes: 30, price: 350, description: 'Napaření, holení břitvou, úprava vousů a balzám.' },
+  { id: 'b3', name: 'Kompletní servis (Střih + Vousy)', category: 'barber', duration_minutes: 75, price: 800, description: 'Klasický střih s kompletní úpravou vousů.' },
+  { id: 't1', name: 'Malé tetování (do 5cm)', category: 'tattoo', duration_minutes: 60, price: 1200, description: 'Jednoduché motivy, nápisy, geometrie.' },
+  { id: 't2', name: 'Střední tetování (do 15cm)', category: 'tattoo', duration_minutes: 150, price: 3000, description: 'Detailnější práce, blackwork nebo lineart.' },
+  { id: 't3', name: 'Konzultace motivu', category: 'tattoo', duration_minutes: 30, price: 0, description: 'Osobní konzultace a návrh vašeho budoucího tetování.' }
+];
+
 /**
  * Převede časový řetězec "HH:MM" na minuty od začátku dne
  */
