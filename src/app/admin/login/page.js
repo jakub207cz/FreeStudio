@@ -3,8 +3,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Lock, Mail, AlertCircle, Scissors, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Scissors, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -144,6 +145,16 @@ export default function AdminLogin() {
             </button>
           </div>
         </form>
+
+        <div className="text-center pt-2">
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-1.5 text-xs text-neutral-400 hover:text-amber-400 transition-all font-semibold"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Zpět na rezervační formulář</span>
+          </Link>
+        </div>
       </div>
     </div>
   );
