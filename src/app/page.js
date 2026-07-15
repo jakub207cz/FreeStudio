@@ -55,6 +55,7 @@ export default function Home() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [checkLoading, setCheckLoading] = useState(false);
   const [availabilityResult, setAvailabilityResult] = useState(null); // { available: bool, alternatives: [] }
+  const [availabilityError, setAvailabilityError] = useState(null);
 
   // Rezervace dokončena
   const [bookingLoading, setBookingLoading] = useState(false);
@@ -149,6 +150,7 @@ export default function Home() {
     setSelectedTimeStr(timeStr);
     setCheckLoading(true);
     setAvailabilityResult(null);
+    setAvailabilityError(null);
 
     const [hours, minutes] = timeStr.split(':').map(Number);
     const startAt = new Date(dateToUse);
@@ -169,9 +171,11 @@ export default function Home() {
       if (response.ok) {
         setAvailabilityResult(data);
       } else {
+        setAvailabilityError(data.error || 'Chyba při zjišťování dostupnosti.');
         console.error('Error checking availability:', data.error);
       }
     } catch (err) {
+      setAvailabilityError('Chyba sítě nebo spojení se serverem.');
       console.error('Chyba při dotazu na dostupnost:', err);
     } finally {
       setCheckLoading(false);
@@ -685,10 +689,25 @@ export default function Home() {
                     </div>
                   )}
 
-                  {!checkLoading && !availabilityResult && (
+                  {!checkLoading && !availabilityResult && !availabilityError && (
                     <div className="flex flex-col items-center justify-center py-6 text-center text-neutral-500 border border-dashed border-neutral-800 rounded-xl">
                       <Info className="h-5 w-5 mb-1.5 text-neutral-600" />
                       <p className="text-xs">Klikněte na libovolný časový slot výše pro zjištění dostupnosti</p>
+                    </div>
+                  )}
+
+                  {!checkLoading && availabilityError && (
+                    <div className="bg-red-500/5 border border-red-500/25 p-4 rounded-xl space-y-2 text-xs text-red-400">
+                      <div className="flex items-center space-x-2 font-semibold">
+                        <AlertTriangle className="h-4.5 w-4.5 shrink-0 text-red-400" />
+                        <span>Chyba při kontrole termínu</span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400">
+                        {availabilityError}
+                      </p>
+                      <p className="text-[10px] text-neutral-500 italic mt-1 leading-relaxed">
+                        Ujistěte se, že jste v Supabase spustili SQL skript z návodu DEPLOYMENT.md a správně nastavili proměnné na Vercelu.
+                      </p>
                     </div>
                   )}
                 </div>
