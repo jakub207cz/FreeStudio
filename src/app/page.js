@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { OPENING_HOURS, getLocalISODateString } from '@/lib/booking-utils';
 import { 
@@ -256,21 +257,32 @@ export default function Home() {
           </div>
         </div>
 
-        {step > 1 && step < 5 && (
-          <button 
-            onClick={() => {
-              setStep(step - 1);
-              if (step === 4) {
-                setAvailabilityResult(null);
-                setSelectedTimeStr('');
-              }
-            }} 
-            className="text-xs font-semibold px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200 border border-neutral-800 rounded-lg flex items-center space-x-1 transition-all"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-            <span>Zpět</span>
-          </button>
-        )}
+        <div className="flex items-center space-x-2">
+          {step > 1 && step < 5 && (
+            <button 
+              onClick={() => {
+                setStep(step - 1);
+                if (step === 4) {
+                  setAvailabilityResult(null);
+                  setSelectedTimeStr('');
+                }
+              }} 
+              className="text-xs font-semibold px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-400 hover:text-neutral-200 border border-neutral-800 rounded-lg flex items-center space-x-1 transition-all cursor-pointer"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              <span>Zpět</span>
+            </button>
+          )}
+
+          {step === 1 && (
+            <Link 
+              href="/admin"
+              className="text-xs font-semibold px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-amber-400 hover:text-amber-300 border border-neutral-800 hover:border-amber-500/20 rounded-lg flex items-center space-x-1 transition-all"
+            >
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Main Flow Card */}
