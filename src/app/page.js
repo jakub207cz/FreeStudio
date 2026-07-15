@@ -213,8 +213,11 @@ export default function Home() {
         setCompletedBooking(data.booking);
         setStep(5); // Hotovo
       } else {
-        setBookingError(data.message || 'Nepodařilo se uložit rezervaci. Zkuste to prosím znovu.');
-        // Pokud byl slot mezitím obsazen, znovu zkontrolujeme stav
+        const errorMsg = data.details 
+          ? `${data.error || 'Chyba databáze'}: ${data.details}` 
+          : (data.error || data.message || 'Nepodařilo se uložit rezervaci. Zkuste to prosím znovu.');
+        setBookingError(errorMsg);
+        // Znovu zkontrolujeme stav
         checkAvailability(selectedTimeStr);
       }
     } catch (err) {

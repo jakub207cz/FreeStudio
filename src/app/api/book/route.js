@@ -55,7 +55,6 @@ export async function POST(request) {
         const defaultService = DEFAULT_SERVICES.find(s => s.id === serviceId);
         if (defaultService) {
           durationMinutes = defaultService.duration_minutes;
-          // Název služby zapíšeme jako vlastního požadavku, aby Barbara viděla, co si objednali
           resolvedCustomRequest = customRequestText 
             ? `${defaultService.name} - ${customRequestText}` 
             : defaultService.name;
@@ -88,7 +87,10 @@ export async function POST(request) {
     if (overlapError) {
       console.error('Chyba při kontrole překryvů před zápisem:', overlapError);
       return Response.json(
-        { error: 'Chyba databáze při validaci termínu.' },
+        { 
+          error: 'Chyba databáze při validaci termínu.',
+          details: overlapError.message || JSON.stringify(overlapError)
+        },
         { status: 500 }
       );
     }
@@ -125,7 +127,10 @@ export async function POST(request) {
     if (insertError) {
       console.error('Chyba při zápisu rezervace do DB:', insertError);
       return Response.json(
-        { error: 'Nepodařilo se uložit rezervaci do databáze.' },
+        { 
+          error: 'Nepodařilo se uložit rezervaci do databáze.',
+          details: insertError.message || JSON.stringify(insertError)
+        },
         { status: 500 }
       );
     }
@@ -138,7 +143,10 @@ export async function POST(request) {
   } catch (error) {
     console.error('Chyba v rezervačním API:', error);
     return Response.json(
-      { error: 'Interní chyba serveru při vytváření rezervace.' },
+      { 
+        error: 'Interní chyba serveru při vytváření rezervace.',
+        details: error.message || JSON.stringify(error)
+      },
       { status: 500 }
     );
   }
